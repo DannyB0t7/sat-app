@@ -1,0 +1,137 @@
+import { createContext, useState } from "react";
+import { Tasks } from "../../tasks";
+
+export const TaskCtx = createContext({
+  checklistTask: [],
+  onCompletedMaster: () => {},
+  onCompleted: () => {},
+  onClearLocalStorage: () => {},
+  onCompletedSwitch: () => {},
+});
+
+function TableContext({ children }) {
+  const storedTasks = JSON.parse(
+    localStorage.getItem("storedchecklistTask")
+  ) || {
+    completedSwitch: false,
+    masterChecklist: false,
+    tasks: Tasks,
+  };
+
+  const [checklistTask, setChecklistTask] = useState(storedTasks);
+
+  //updating masterchecklist status and updating local storage
+  const masterChecklistHandler = () => {
+    setChecklistTask((prevState) => {
+      let bool = prevState.masterChecklist ? false : true;
+
+      let updatedTasks = [];
+
+      if (bool) {
+        updatedTasks = prevState.tasks.map((taskobj) => {
+          return {
+            ...taskobj,
+            completed: true,
+          };
+        });
+      } else {
+        updatedTasks = prevState.tasks.map((taskobj) => {
+          return {
+            ...taskobj,
+            completed: false,
+          };
+        });
+      }
+
+      let updatedChecklistTask = {
+        ...prevState,
+        masterChecklist: bool,
+        tasks: updatedTasks,
+      };
+
+      localStorage.setItem(
+        "storedchecklistTask",
+        JSON.stringify(updatedChecklistTask)
+      );
+
+      return updatedChecklistTask;
+    });
+  };
+
+  //changing completed status for tasks and setting local storage for tasks
+  const completedTaskHandler = (id) => {
+    setChecklistTask((prevState) => {
+      const [exsistingTask] = prevState.tasks.filter(
+        (taskObj) => taskObj.id === id
+      );
+
+      const exsistingTaskIndex = prevState.tasks.findIndex(
+        (taskobj) => taskobj.id === id
+      );
+
+      const updatedTasks = [...prevState.tasks];
+
+      let bool;
+      if (exsistingTask.completed) {
+        bool = false;
+      } else {
+        bool = true;
+      }
+
+      updatedTasks[exsistingTaskIndex] = {
+        ...exsistingTask,
+        completed: bool,
+      };
+
+      let updatedChecklistTask = {
+        ...prevState,
+        tasks: updatedTasks,
+      };
+
+      localStorage.setItem(
+        "storedchecklistTask",
+        JSON.stringify(updatedChecklistTask)
+      );
+
+      return updatedChecklistTask;
+    });
+  };
+
+  //clearing local storage and updating state
+  const clearLocalStorage = () => {
+    localStorage.clear("storedchecklistTask");
+    setChecklistTask({
+      completedSwitch: false,
+      masterChecklist: false,
+      tasks: Tasks,
+    });
+  };
+
+  //updating switch status and updating localstorage
+  const completedSwitchHandler = () => {
+    setChecklistTask((prevState) => {
+      const updatedCompletedSwitch = prevState.completedSwitch ? false : true;
+
+      const updatedState = {
+        ...prevState,
+        completedSwitch: updatedCompletedSwitch,
+      };
+
+      localStorage.setItem("storedchecklistTask", JSON.stringify(updatedState));
+
+      return updatedState;
+    });
+  };
+
+  const checklistCtx = {
+    checklistTask: checklistTask,
+    onCompletedMaster: masterChecklistHandler,
+    onCompleted: completedTaskHandler,
+    onClearLocalStorage: clearLocalStorage,
+    onCompletedSwitch: completedSwitchHandler,
+  };
+
+  return <TaskCtx.Provider value={checklistCtx}>{children}</TaskCtx.Provider>;
+}
+
+export default TableContext;
