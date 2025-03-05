@@ -25,7 +25,7 @@ function Completed() {
       <p
         style={{
           fontSize: "12px",
-          color: `${checklistTask.completedSwitch ? "black" : "grey"}`,
+          color: `${checklistTask.completedSwitch ? "white" : "grey"}`,
         }}
       >
         Completed

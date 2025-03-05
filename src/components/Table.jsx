@@ -1,13 +1,17 @@
 import React, { useContext } from "react";
-import { Table, Checkbox } from "@radix-ui/themes";
+import { Table, Checkbox, Select } from "@radix-ui/themes";
+import { status } from "../../TaskStatus.js";
 import { TaskCtx } from "../store/TableContext";
 
 function TableComp() {
-  const { checklistTask, onCompletedMaster, onCompleted } = useContext(TaskCtx);
+  const { checklistTask, onCompletedMaster, onCompleted, onTaskStatus } =
+    useContext(TaskCtx);
 
   const filteredTasks = checklistTask.tasks.filter((taskObj) => {
     if (taskObj.completed === checklistTask.completedSwitch) return taskObj;
   });
+
+  // console.log(status);
 
   return (
     <Table.Root>
@@ -21,6 +25,7 @@ function TableComp() {
             />
           </Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>Phase</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>Responsible Team</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>Task</Table.ColumnHeaderCell>
         </Table.Row>
@@ -33,12 +38,13 @@ function TableComp() {
             <Table.Cell>No tasks to display...</Table.Cell>
             <Table.RowHeaderCell></Table.RowHeaderCell>
             <Table.RowHeaderCell></Table.RowHeaderCell>
+            <Table.RowHeaderCell></Table.RowHeaderCell>
           </Table.Row>
         )}
 
         {filteredTasks.length > 0 &&
           filteredTasks.map((taskObj) => (
-            <Table.Row key={taskObj.id}>
+            <Table.Row key={taskObj.id} align="center">
               <Table.RowHeaderCell>
                 <Checkbox
                   color="iris"
@@ -47,6 +53,24 @@ function TableComp() {
                 />
               </Table.RowHeaderCell>
               <Table.Cell>{taskObj.phase}</Table.Cell>
+              {/* select start*/}
+
+              <Table.Cell>
+                <Select.Root
+                  value={taskObj.status}
+                  onValueChange={(val) => onTaskStatus(taskObj.id, val)}
+                >
+                  <Select.Trigger>{}</Select.Trigger>
+                  <Select.Content color="iris">
+                    <Select.Group>
+                      <Select.Item value="not-started">Not Started</Select.Item>
+                      <Select.Item value="in-progress">In Progress</Select.Item>
+                      <Select.Item value="completed">Completed</Select.Item>
+                    </Select.Group>
+                  </Select.Content>
+                </Select.Root>
+              </Table.Cell>
+              {/* select end */}
               <Table.Cell>{taskObj.team}</Table.Cell>
               <Table.Cell>{taskObj.task}</Table.Cell>
             </Table.Row>

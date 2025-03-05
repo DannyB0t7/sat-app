@@ -1,8 +1,10 @@
 import { createContext, useState } from "react";
 import { Tasks } from "../../tasks";
+import { status } from "../../TaskStatus";
 
 export const TaskCtx = createContext({
   checklistTask: [],
+  onTaskStatus: () => {},
   onCompletedMaster: () => {},
   onCompleted: () => {},
   onClearLocalStorage: () => {},
@@ -32,6 +34,7 @@ function TableContext({ children }) {
           return {
             ...taskobj,
             completed: true,
+            status: "completed",
           };
         });
       } else {
@@ -39,6 +42,7 @@ function TableContext({ children }) {
           return {
             ...taskobj,
             completed: false,
+            status: 'not-started'
           };
         });
       }
@@ -56,6 +60,49 @@ function TableContext({ children }) {
 
       return updatedChecklistTask;
     });
+  };
+
+  //updating the status of each task and when status completed set=true
+
+  const taskStatusHandler = (id, val) => {
+    setChecklistTask((prevState) => {
+      const [exsistingTask] = prevState.tasks.filter(
+        (taskObj) => taskObj.id === id
+      );
+
+      const exsistingTaskIndex = prevState.tasks.findIndex(
+        (taskobj) => taskobj.id === id
+      );
+
+      const updatedTasks = [...prevState.tasks];
+
+      if (val === "completed") {
+        updatedTasks[exsistingTaskIndex] = {
+          ...exsistingTask,
+          completed: true,
+          status: val,
+        };
+      } else {
+        updatedTasks[exsistingTaskIndex] = {
+          ...exsistingTask,
+          status: val,
+        };
+      }
+
+      const updatedChecklistTask = {
+        ...prevState,
+        tasks: updatedTasks,
+      };
+
+      localStorage.setItem(
+        "storedchecklistTask",
+        JSON.stringify(updatedChecklistTask)
+      );
+
+      return updatedChecklistTask;
+    });
+
+    // console.log(id, val);
   };
 
   //changing completed status for tasks and setting local storage for tasks
@@ -125,6 +172,7 @@ function TableContext({ children }) {
 
   const checklistCtx = {
     checklistTask: checklistTask,
+    onTaskStatus: taskStatusHandler,
     onCompletedMaster: masterChecklistHandler,
     onCompleted: completedTaskHandler,
     onClearLocalStorage: clearLocalStorage,
