@@ -10,8 +10,8 @@ import SearchCont from "./components/SearchCont";
 import SearchContext from "./store/SearchContext";
 
 const Container = styled.div`
-  margin: 2.5rem auto;
-  padding: 0 1rem;
+  margin: auto;
+  padding: 2.5rem 1rem;
   max-width: 1536px;
 `;
 
