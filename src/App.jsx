@@ -6,7 +6,8 @@ import styled from "styled-components";
 import TableContext from "./store/TableContext";
 import Header from "./components/Header";
 import Reset from "./components/Reset";
-import Completed from "./components/Completed";
+import SearchCont from "./components/SearchCont";
+import SearchContext from "./store/SearchContext";
 
 const Container = styled.div`
   margin: 2.5rem auto;
@@ -17,12 +18,14 @@ const Container = styled.div`
 function App() {
   return (
     <TableContext>
-      <Container>
-        <Header />
-        <Completed />
-        <TableComp />
-        <Reset />
-      </Container>
+      <SearchContext>
+        <Container>
+          <Header />
+          <SearchCont />
+          <TableComp />
+          <Reset />
+        </Container>
+      </SearchContext>
     </TableContext>
   );
 }

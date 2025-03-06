@@ -1,6 +1,5 @@
 import { createContext, useState } from "react";
 import { Tasks } from "../../tasks";
-import { status } from "../../TaskStatus";
 
 export const TaskCtx = createContext({
   checklistTask: [],
@@ -42,7 +41,7 @@ function TableContext({ children }) {
           return {
             ...taskobj,
             completed: false,
-            status: 'not-started'
+            status: "not-started",
           };
         });
       }
@@ -62,8 +61,7 @@ function TableContext({ children }) {
     });
   };
 
-  //updating the status of each task and when status completed set=true
-
+  //updating the status of each task, status complete - completed true || setting local storage
   const taskStatusHandler = (id, val) => {
     setChecklistTask((prevState) => {
       const [exsistingTask] = prevState.tasks.filter(
@@ -75,6 +73,29 @@ function TableContext({ children }) {
       );
 
       const updatedTasks = [...prevState.tasks];
+
+      if (
+        prevState.completedSwitch === true &&
+        (val === "in-progress" || val === "not-started")
+      ) {
+        updatedTasks[exsistingTaskIndex] = {
+          ...exsistingTask,
+          completed: false,
+          status: val,
+        };
+
+        const updatedChecklistTask = {
+          ...prevState,
+          tasks: updatedTasks,
+        };
+
+        localStorage.setItem(
+          "storedchecklistTask",
+          JSON.stringify(updatedChecklistTask)
+        );
+
+        return updatedChecklistTask;
+      }
 
       if (val === "completed") {
         updatedTasks[exsistingTaskIndex] = {
@@ -125,10 +146,18 @@ function TableContext({ children }) {
         bool = true;
       }
 
-      updatedTasks[exsistingTaskIndex] = {
-        ...exsistingTask,
-        completed: bool,
-      };
+      if (bool) {
+        updatedTasks[exsistingTaskIndex] = {
+          ...exsistingTask,
+          status: "completed",
+          completed: bool,
+        };
+      } else {
+        updatedTasks[exsistingTaskIndex] = {
+          ...exsistingTask,
+          completed: bool,
+        };
+      }
 
       let updatedChecklistTask = {
         ...prevState,

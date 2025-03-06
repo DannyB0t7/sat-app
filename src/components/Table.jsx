@@ -1,17 +1,24 @@
 import React, { useContext } from "react";
 import { Table, Checkbox, Select } from "@radix-ui/themes";
-import { status } from "../../TaskStatus.js";
 import { TaskCtx } from "../store/TableContext";
+import { FilterCtx } from "../store/SearchContext";
 
 function TableComp() {
   const { checklistTask, onCompletedMaster, onCompleted, onTaskStatus } =
     useContext(TaskCtx);
 
-  const filteredTasks = checklistTask.tasks.filter((taskObj) => {
+  const { enteredData } = useContext(FilterCtx);
+
+  let filteredTasks = checklistTask.tasks.filter((taskObj) => {
     if (taskObj.completed === checklistTask.completedSwitch) return taskObj;
   });
 
-  // console.log(status);
+  if (enteredData !== "") {
+    filteredTasks = [...filteredTasks].filter((taskObj) => {
+      if (taskObj.team.toLowerCase().includes(enteredData.toLowerCase()))
+        return taskObj;
+    });
+  }
 
   return (
     <Table.Root>
