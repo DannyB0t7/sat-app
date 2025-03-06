@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { Tasks } from "../../tasks";
+import { Tasks } from "../../Task";
 
 export const TaskCtx = createContext({
   checklistTask: [],
