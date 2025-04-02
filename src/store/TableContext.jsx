@@ -155,6 +155,7 @@ function TableContext({ children }) {
       } else {
         updatedTasks[exsistingTaskIndex] = {
           ...exsistingTask,
+          status: 'in-progress',
           completed: bool,
         };
       }
